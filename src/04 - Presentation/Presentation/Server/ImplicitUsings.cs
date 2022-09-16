@@ -1,0 +1,11 @@
+global using System.Net;
+global using MediatR;
+global using Microsoft.AspNetCore.Mvc;
+global using BuildingBlocks.Exceptions;
+global using BuildingBlocks.Handlers.Commands;
+global using BuildingBlocks.Handlers.Queries;
+global using BuildingBlocks.Startup;
+global using Domain.Entities;
+global using Domain.DTO;
+global using Service.Interfaces;
+global using Presentation.Shared;

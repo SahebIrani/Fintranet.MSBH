@@ -1,36 +1,106 @@
-using Microsoft.AspNetCore.ResponseCompression;
-
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllers();
 builder.Services.AddRazorPages();
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+builder.Services.AddConfigureServices(builder.Host, builder.Configuration);
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    app.UseDeveloperExceptionPage();
     app.UseWebAssemblyDebugging();
+
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 else
 {
     app.UseExceptionHandler("/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+app.UseConfigure(builder.Environment, builder.Configuration);
 
+app.UseHttpsRedirection();
 app.UseBlazorFrameworkFiles();
 app.UseStaticFiles();
 
 app.UseRouting();
 
-
-app.MapRazorPages();
 app.MapControllers();
+app.MapRazorPages();
 app.MapFallbackToFile("index.html");
 
-app.Run();
+//using var scope = app.Services.CreateScope();
+//var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+//if (db.Database.GetPendingMigrations().Any()) await db.Database.MigrateAsync();
+
+app.MapGet("/weatherforecast", (HttpContext httpContext) =>
+{
+    List<WeatherForecast> response = WeatherForecastGenerator.GenerateWeatherForecast();
+
+    IPAddress? userIp = httpContext?.Connection?.RemoteIpAddress;
+
+    app.Logger.LogInformation($"[Request from {userIp}: Serving Get() response: {string.Join("\n", response.ToList())}");
+
+    return response;
+})
+.WithName("GetWeatherForecast")
+;
+
+app.MapGet("/getcustomers", async (ICustomerService customerService) =>
+{
+    var customers = await customerService.GetCustomersAsync();
+
+    return Results.Ok(customers);
+})
+.WithName("GetCustomers")
+;
+
+app.MapGet("/customers/getall", async (IMediator mediator) =>
+{
+    var customers = await mediator.Send(new GetAllCustomerQuery());
+
+    return Results.Ok(customers);
+})
+.WithName("GetAllCustomer")
+;
+
+app.MapGet("/customers/get/{id}", async (Guid id, IMediator mediator) =>
+{
+    var customer = await mediator.Send(new GetCustomerByIdQuery(id));
+
+    return Results.Ok(customer);
+})
+.WithName("GetCustomer")
+;
+
+app.MapPost("/customers/create", async ([FromBody] CreateCustomerDTO model, IMediator mediator) =>
+{
+    try
+    {
+        var command = new CreateCustomerCommand(model);
+
+        var responseCustomerId = await mediator.Send(command);
+
+        //return Results.StatusCode((int)HttpStatusCode.Created);
+
+        return Results.Created(string.Empty, responseCustomerId);
+    }
+    catch (InvalidRequestBodyException ex)
+    {
+        return Results.BadRequest(new BaseResponseDTO(false, ex.Errors));
+    }
+})
+.WithName("CreateCustomer")
+;
+
+await app.RunAsync();
+
+public partial class Program
+{ }

@@ -23,16 +23,3 @@
 **/values.dev.yaml
 LICENSE
 README.md
-
-.tye
-.devcontainer/certs
-.logs
-out/
-assets/
-rs/
-.github
-.config
-components
-src/Web
-nuget.config
-global.json
