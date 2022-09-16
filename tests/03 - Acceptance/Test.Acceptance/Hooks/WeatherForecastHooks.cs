@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 namespace Test.Acceptance.Hooks;
 
 [Binding]
-public class WeatherForecastHooks
+public sealed class WeatherForecastHooks
 {
     private readonly IObjectContainer _objectContainer;
 
@@ -34,5 +34,24 @@ public class WeatherForecastHooks
     {
         //var service = factory.Services.GetService(typeof(IMyService));
         await Task.CompletedTask;
+    }
+
+    private static readonly DotNetCoreHost Host =
+    new DotNetCoreHost(new DotNetCoreHostOptions
+    {
+        Port = HostConstants.Port,
+        CsProjectPath = HostConstants.CsProjectPath
+    });
+
+    [BeforeFeature("api")]
+    public static void StartHost()
+    {
+        Host.Start();
+    }
+
+    [AfterFeature("api")]
+    public static void ShutdownHost()
+    {
+        Host.Stop();
     }
 }

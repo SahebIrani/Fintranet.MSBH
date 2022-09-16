@@ -3,7 +3,7 @@ Feature: Weather Forecast Web API
 Hi everybody, Go2sh .. !!!! ♥️💖 
 Minimal Web API for weather forecasts ..
 
-@MSBH
+@api
 Scenario: Get weather forecasts
   Given I'm a client
   And the repository has weather data
