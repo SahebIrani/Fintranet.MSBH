@@ -1,5 +1,12 @@
+using Data.EF.DatabaseContext;
+using System.Net.Http.Headers;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.VisualStudio.TestPlatform.TestHost;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+
+using Xunit;
 
 namespace Test.Integration;
 
@@ -61,7 +68,7 @@ public class CustomersControllerIntegrationTests : IClassFixture<WebApplicationF
         var clientOptions = new WebApplicationFactoryClientOptions
         {
             AllowAutoRedirect = true,
-            BaseAddress = new Uri("http://localhost"),
+            BaseAddress = new Uri("https://localhost:7085"),
             HandleCookies = true,
             MaxAutomaticRedirections = 7
         };
@@ -91,7 +98,7 @@ public class CustomersControllerIntegrationTests : IClassFixture<WebApplicationF
     [Fact]
     public async Task Index_WhenCalled_ReturnsApplicationForm()
     {
-        var response = await _httpClient.GetAsync("/customers/getall");
+        var response = await _httpClient.GetAsync("/CustomersContoller/GetAll");
 
         response.EnsureSuccessStatusCode();
 
@@ -104,7 +111,7 @@ public class CustomersControllerIntegrationTests : IClassFixture<WebApplicationF
     [Fact]
     public async Task Create_WhenPOSTExecuted_ReturnsToApiResultCustomer()
     {
-        var postRequest = new HttpRequestMessage(HttpMethod.Post, "/customers/create");
+        var postRequest = new HttpRequestMessage(HttpMethod.Post, "/CustomersContoller/Add");
 
         var formModel = new Dictionary<string, string>
         {
@@ -114,7 +121,7 @@ public class CustomersControllerIntegrationTests : IClassFixture<WebApplicationF
             { "phoneNumber", "+44 117 496 0123" },
             { "countryCodeSelected", "US" },
             { "email", "jackslater.irani@gmail.com" },
-            { "bankAccountNumber", "13" },
+            { "bankAccountNumber", "1234" },
         };
 
         postRequest.Content = new FormUrlEncodedContent(formModel);

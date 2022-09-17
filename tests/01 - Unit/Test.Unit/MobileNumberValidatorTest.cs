@@ -9,10 +9,10 @@ public class MobileNumberValidatorTest
     public static IEnumerable<object[]> Data()
     {
         yield return new object[] { "+989123456789", true };
-        yield return new object[] { "+31611345668", true };
-        yield return new object[] { "+982186776651", false };
-        yield return new object[] { "+16151548871", true };
-        yield return new object[] { "0912534", false };
+        yield return new object[] { "+31612345678", true };
+        yield return new object[] { "+982188776655", false };
+        yield return new object[] { "+16156548877", true };
+        yield return new object[] { "0912134", false };
     }
 
     [Theory(DisplayName = "MobileNumberIsValid"), MemberData(nameof(Data))]

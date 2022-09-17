@@ -1,14 +1,15 @@
 using System.Net;
-
+using System.Net.Http;
+using System.Net.Http.Json;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.VisualStudio.TestPlatform.TestHost;
+using Presentation.Shared;
 
 namespace Test.Acceptance.StepDefinitions;
 
 [Binding]
 public class WeatherForecastWebAPIStepDefinitions
 {
-    private const string BaseAddress = "http://localhost/";
+    private const string BaseAddress = "https://localhost:5001/";
     public WebApplicationFactory<Program> Factory { get; }
     public HttpClient Client { get; set; } = null!;
     private HttpResponseMessage Response { get; set; } = null!;
@@ -23,9 +24,9 @@ public class WeatherForecastWebAPIStepDefinitions
     }
 
     [Given(@"the repository has weather data")]
-    public void GivenTheRepositoryHasWeatherData()
+    public async Task GivenTheRepositoryHasWeatherData()
     {
-        //var forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>("WeatherForecast");
+        var forecasts = await Client.GetFromJsonAsync<WeatherForecast[]>("WeatherForecast");
         Response = await Client.GetAsync($"WeatherForecast");
     }
 

@@ -2,6 +2,9 @@ using BoDi;
 
 using Microsoft.AspNetCore.Mvc.Testing;
 
+using Test.Acceptance.Tools;
+using Test.Acceptance.Tools.NetCoreHosting;
+
 namespace Test.Acceptance.Hooks;
 
 [Binding]
